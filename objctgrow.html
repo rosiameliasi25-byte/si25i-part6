@@ -1,0 +1,193 @@
+<script>
+/* ================= DATA MAHASISWA ================= */
+const student = {
+  name: 'Rosi Amelia',
+  activity: 'Idle',
+  hobby: '-',
+  update(activityName, hobbyName) {
+    this.activity = activityName;
+    this.hobby = hobbyName;
+    document.getElementById('activity').textContent = this.activity;
+    document.getElementById('hobby').textContent = this.hobby;
+  }
+};
+
+let lastActivity = null;
+
+/* ================= ACTIVITY TABLE ================= */
+function handleActivity(activityName, hobbyName) {
+  const table = document.getElementById('tableWrapper');
+  if (lastActivity === activityName && table.classList.contains('show')) {
+    table.classList.remove('show');
+  } else {
+    table.classList.add('show');
+    student.update(activityName, hobbyName);
+    lastActivity = activityName;
+  }
+}
+
+/* ================= DATE ================= */
+document.getElementById('today').textContent =
+  new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
+/* ================= CATEGORY DATA ================= */
+const categories = {
+  word: ['Writing', 'Journaling', 'Reading'],
+  visual: ['Photography', 'Design', 'Editing'],
+  coding: ['Web', 'Logic', 'Debugging'],
+  movement: ['Stretching', 'Walking', 'Workout'],
+  relax: ['Gaming', 'Music', 'Watching']
+};
+
+/* ================= MINI GAMES (3 PER CATEGORY) ================= */
+const miniGames = {
+  word: [
+    'Write 3 sentences before time runs out',
+    'Create 5 random words',
+    'Summarize one idea in your head'
+  ],
+  visual: [
+    'Find 3 objects with aesthetic colors',
+    'Plan a photo angle',
+    'Imagine a poster layout'
+  ],
+  coding: [
+    'Think of 3 variable names',
+    'Mentally trace a loop',
+    'Spot 1 bug in old code'
+  ],
+  movement: [
+    'Stretch arms & legs',
+    'Walk around the room',
+    '10 jumping jacks'
+  ],
+  relax: [
+    'Play 1 MLBB match',
+    'Listen to 1 song fully',
+    'Close eyes & breathe'
+  ]
+};
+
+/* ================= STATE ================= */
+let activeCategory = '';
+let gameTimer = null;
+let timeLeft = 60;
+
+/* ================= CATEGORY CLICK ================= */
+function showCategory(key) {
+  const category = document.querySelector('.category');
+  const action = document.querySelector('.action');
+
+  if (activeCategory === key) {
+    document.getElementById('categoryResult').innerHTML = '';
+    document.getElementById('actionButtons').innerHTML = '';
+    document.getElementById('categoryCTA').classList.add('hidden');
+    action.classList.add('hidden');
+    activeCategory = '';
+    return;
+  }
+
+  activeCategory = key;
+
+  document.getElementById('categoryResult').innerHTML =
+    `<strong>Hobbies:</strong><br>` +
+    categories[key].map(h => `• ${h}`).join('<br>');
+
+  document.getElementById('actionButtons').innerHTML =
+    miniGames[key]
+      .map(game => `<button onclick="startGame('${game}')">${game}</button>`)
+      .join('');
+
+  document.getElementById('categoryCTA').classList.remove('hidden');
+  action.classList.add('hidden');
+}
+
+/* ================= OPEN ACTION ================= */
+function openAction() {
+  document.querySelector('.action').classList.remove('hidden');
+  document.getElementById('categoryCTA').classList.add('hidden');
+}
+
+/* ================= GAME LOGIC ================= */
+function startGame(task) {
+  clearInterval(gameTimer);
+  timeLeft = 60;
+
+  document.getElementById('miniGame').classList.remove('hidden');
+  document.getElementById('gameTask').textContent = task;
+  document.getElementById('timeLeft').textContent = timeLeft;
+
+  gameTimer = setInterval(() => {
+    timeLeft--;
+    document.getElementById('timeLeft').textContent = timeLeft;
+
+    if (timeLeft <= 0) {
+      clearInterval(gameTimer);
+      document.getElementById('gameTask').textContent =
+        '⏰ Time is up! You can still finish it 💪';
+    }
+  }, 1000);
+}
+
+function completeGame() {
+  clearInterval(gameTimer);
+  document.getElementById('miniGame').classList.add('hidden');
+  addToHistory(document.getElementById('gameTask').textContent);
+  celebrate();
+}
+
+/* ================= HISTORY ================= */
+const activityHistory = [];
+
+function addToHistory(action) {
+  const time = new Date().toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
+  activityHistory.unshift(`${time} — ${action}`);
+  renderHistory();
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  list.innerHTML = '';
+
+  activityHistory.forEach(item => {
+    const li = document.createElement('li');
+    li.textContent = item;
+    list.appendChild(li);
+  });
+}
+
+/* ================= CHECK IN ================= */
+function checkInYes() {
+  document.getElementById('checkinResult').innerHTML =
+    "✨ Amazing! Kamu sudah produktif hari ini 💙";
+  celebrate();
+}
+
+function checkInNo() {
+  document.getElementById('checkinResult').innerHTML =
+    "🌱 Tidak apa-apa. Yuk mulai dari game kecil dulu 👇";
+  document.querySelector('.category').classList.remove('hidden');
+  celebrate();
+}
+
+/* ================= CONFETTI ================= */
+function celebrate() {
+  for (let i = 0; i < 30; i++) {
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.setProperty('--hue', Math.random() * 360);
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 2000);
+  }
+}
+</script>
