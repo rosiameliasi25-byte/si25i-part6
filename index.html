@@ -17,30 +17,45 @@
       min-height: 100vh;
     }
 
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: url('profile.jpg') center / cover no-repeat;
-      filter: (12px) brightness(0.5);
-      z-index: -2;
-    }
+   body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
 
-    body::after {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: rgba(15,23,42,0.55);
-      z-index: -1;
-    }
+  /* background hanya gradasi lembut, BUKAN kabut */
+  background: radial-gradient(
+    circle at top left,
+    rgba(255,255,255,0.06),
+    rgba(10,15,30,0.2)
+  );
+
+  /* blur DIKURANGI */
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+
+  /* INI KUNCI AGAR BISA DIKLIK */
+  pointer-events: none;
+
+  /* HARUS DI BELAKANG */
+  z-index: -1;
+}
+
+   body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(15,23,42,0.55);
+  z-index: -1;
+  pointer-events: none;
+}
 
     .container {
       max-width: 1200px;
       margin: 80px auto;
       padding: 60px;
       background: rgba(255,255,255,0.65);
-      backdrop-filter: (120px) saturate(1.1);
-      -webkit-backdrop-filter: (120px) saturate(1.1);
+      backdrop-filter: blur(120px) saturate(1.1);
+      -webkit-backdrop-filter: blur(120px) saturate(1.1);
       border-radius: 32px;
       box-shadow: 0 40px 120px rgba(0,0,0,0.35);
       border: 1px solid rgba(255,255,255,0.4);
@@ -311,6 +326,10 @@
   background: rgba(255,255,255,0.55);
   backdrop-filter: blur(18px);
   box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+
+  overflow: hidden;
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 .history-text {
@@ -340,6 +359,17 @@
   color: #64748b;
   background: transparent;
   box-shadow: none;
+}
+
+.history-buttons button {
+  padding: 12px 20px;
+  border-radius: 999px;
+  border: none;
+  background: #0f172a;
+  color: white;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.3s;
 }
 .hidden {
   display: none;
@@ -577,10 +607,9 @@
 
   <div class="checkin-buttons">
     <button onclick="checkInYes()">Yes, already ✨</button>
-    <button onclick="checkInNo()">Not yet, help me 🚀</button>
+    <button onclick="checkInNo()">Not yet</button>
   </div>
-
-  <p id="checkinResult" class="checkin-result"></p>
+  <div id="checkinResult" class="checkin-result"></div>
 </section>
 
 <section class="category hidden">
@@ -589,6 +618,7 @@
     Pick a category and discover activities you can do right now.
   </p>
 
+  <!-- CATEGORY BUTTONS -->
   <div class="category-buttons">
     <button onclick="showCategory('word')">✍️ Word & Thinking</button>
     <button onclick="showCategory('visual')">🎨 Visual & Creative</button>
@@ -597,43 +627,46 @@
     <button onclick="showCategory('relax')">🎮 Relax & Fun</button>
   </div>
 
+  <!-- CATEGORY RESULT -->
   <div id="categoryResult" class="category-result"></div>
-  <div id="categoryCTA" class="category-cta hidden">
-  <button onclick="openAction()">
-    🚀 Start one small action 👇
-  </button>
-</div>
+
+  <!-- CTA -->
+  <div class="category-cta hidden" id="categoryCTA">
+    <button onclick="openAction()">🚀 Start Activity</button>
+  </div>
 </section>
 
+<!-- ACTION SECTION -->
 <section class="action hidden">
   <h2>Start a Small Action</h2>
   <p class="action-text">
-    Choose one action below and start right now. Small steps matter.
+    Choose one task and complete it below.
   </p>
+
   <div class="action-buttons" id="actionButtons"></div>
   <div id="actionResult" class="action-result"></div>
-<div id="miniGame" class="mini-game hidden">
-  <!-- SIDEBAR PROGRESS BAR -->
-  <div id="gameSidebar" class="game-sidebar">
-    <div class="sidebar-header">
-      <div class="progress-circle" id="progressCircle">
-        <span id="progressText">0%</span>
-      </div>
-      <div>
+
+  <!-- MINI GAME -->
+  <div id="miniGame" class="mini-game hidden">
+
+    <!-- SIDEBAR -->
+    <div id="gameSidebar" class="game-sidebar">
+      <div class="sidebar-header">
+        <div class="progress-circle" id="progressCircle">
+          <span id="progressText">0%</span>
+        </div>
         <h4 class="sidebar-title" id="sidebarTitle">Task Progress</h4>
       </div>
+
+      <div id="sidebarValidation" class="validation-box">
+        📝 Start typing...
+      </div>
+      <div class="time-display">
+        ⏳ <span id="sidebarTimeLeft">60</span>s
+      </div>
     </div>
-    
-    <div id="sidebarValidation" class="validation-box">
-      📝 Start typing...
-    </div>
-    
-    <div class="time-display">
-      ⏳ <span id="sidebarTimeLeft">60</span>s
-    </div>
-  </div>
-  
-  <!-- MAIN GAME AREA -->
+
+    <!-- MAIN GAME AREA -->
   <div style="position: relative; z-index: 2;">
     <p id="gameTask" class="game-task"></p>
     <div id="gameArea"></div>
@@ -646,6 +679,10 @@
   </div>
 </div>
 
+  </div>
+</section>
+
+<section class="history hidden">
 <section class="history">
   <h2>Activity History</h2>
   <p class="history-text">
@@ -655,6 +692,7 @@
   <ul id="historyList" class="history-list">
     <li class="empty">No activity yet. Start one above ✨</li>
   </ul>
+</section>
 </section>
 
   <div class="quote">
@@ -666,6 +704,7 @@
 <script>
 let activeCategory = null;
 let timer = null;
+let currentGame = null;
 const miniGames = {
   word: [
     { type: "text", task: "Write 3 simple sentences", time: 90 },
@@ -824,7 +863,13 @@ function openAction() {
 
 // 🔥 MAIN GAME FUNCTION - FULLY INTEGRATED WITH SIDEBAR
 function startGame(category, index) {
+  document.getElementById("actionResult").innerHTML = "";
   const game = miniGames[category][index];
+  currentGame = {
+  category,
+  index,
+  task: game.task
+};
   const area = document.getElementById("gameArea");
   const miniGame = document.getElementById("miniGame");
   
@@ -955,7 +1000,7 @@ function completeGame() {
   document.getElementById("miniGame").classList.add("hidden");
   document.getElementById("gameSidebar").classList.remove("show");
   
-  const gameName = miniGames[activeCategory]?.[0]?.task || "Task";
+ const gameName = currentGame?.task || "Unknown Task"; 
   document.getElementById("actionResult").innerHTML = `
     <div style="background: linear-gradient(135deg, #22c55e, #16a34a); color: white; padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 15px 35px rgba(34,197,94,0.3);">
       <div style="font-size: 48px; margin-bottom: 15px;">🎊</div>
@@ -965,11 +1010,10 @@ function completeGame() {
     </div>
   `;
 
-  addToHistory(`✅ "${gameName}" - Fully completed!`);
+  addToHistory(` "${gameName}" - Fully completed!`);
   celebrate();
 }
 
-// Sisanya sama...
 const categories = {
   word: ['Writing stories or poetry','Journaling','Public speaking','Debating ideas','Reading books or articles','Script writing','Copywriting'],
   visual: ['Photography','Videography','Filmmaking','Graphic design','Illustration','Content creation','Photo editing'],
@@ -987,7 +1031,7 @@ const activityHistory = [];
 
 function addToHistory(actionName) {
   const time = new Date().toLocaleString('en-US', {weekday: 'short', hour: '2-digit', minute: '2-digit'});
-  activityHistory.unshift(`${time} — ${actionName}`);
+  activityHistory.unshift(`${time} : ${actionName}`);
   renderHistory();
 }
 
@@ -1014,6 +1058,8 @@ function checkInNo() {
   document.getElementById('checkinResult').innerHTML = "🌱 It's okay. Every process starts with a small intention. Let's choose one activity below. 👇";
   document.querySelector('.category').classList.remove('hidden');
   celebrate();
+  document.getElementById('categoryCTA').classList.remove('hidden');
+  document.querySelector('.history').classList.remove('hidden');
 }
 
 function celebrate() {
